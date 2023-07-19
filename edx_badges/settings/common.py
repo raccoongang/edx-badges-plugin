@@ -40,4 +40,14 @@ def plugin_settings(settings):
     Set of plugin settings used by the Open Edx platform.
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
-    pass
+
+    settings.FEATURES["CREDLY"] = {
+        "ORGANIZATION_ID": None,
+        "API_BASE_URL": None,
+        "BASE_URL": None,
+        "AUTHORIZATION_TOKEN": None,
+        "6TH_BADGE": {
+            "BADGE_TEMPLATE_ID": None,
+            "COURSE_IDS": None,
+        }
+    }

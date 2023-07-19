@@ -45,5 +45,5 @@ setup(
     include_package_data=True,
     install_requires=load_requirements('requirements/base.in'),
     zip_safe=False,
-    entry_points={"lms.djangoapp": [APP_NAME]},
+    entry_points={"lms.djangoapp": [APP_NAME], "cms.djangoapp": [APP_NAME]},
 )
