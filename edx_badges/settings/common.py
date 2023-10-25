@@ -34,10 +34,17 @@ TIME_ZONE = 'UTC'
 USE_TZ = True
 
 
-# pylint: disable=unnecessary-pass,unused-argument
 def plugin_settings(settings):
     """
     Set of plugin settings used by the Open Edx platform.
     More info: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
-    pass
+    settings.CREDLY_BADGES_CONFIGURATION = {
+        "ORGANIZATION_ID": None,
+        "API_BASE_URL": None,
+        "BASE_URL": None,
+        "AUTHORIZATION_TOKEN": None,
+    }
+
+    settings.BADGING_BACKEND = "edx_badges.backends.CredlyBackend"
+    settings.FEATURES['ENABLE_OPENBADGES'] = True
