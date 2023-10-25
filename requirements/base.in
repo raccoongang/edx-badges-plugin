@@ -1,3 +1,4 @@
 # Main requirements of your plugin application.
 -c constraints.txt
 
+pydantic==1.10.13
