@@ -11,7 +11,8 @@ Change Log
 .. There should always be an "Unreleased" section for changes pending release.
 Unreleased
 ----------
-Add Credly backend and necessary settings for enabling Credly integration.
+* Create Webhook endpoint to receive credly event stage changes.
+* Add Credly backend and necessary settings for enabling Credly integration.
 
 
 [0.0.0] - 2023-07-18

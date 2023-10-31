@@ -1,24 +1,19 @@
-import base64
 import logging
 from datetime import datetime
 
 import pytz
 import requests
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from lms.djangoapps.badges.backends.base import BadgeBackend
 from lms.djangoapps.badges.models import BadgeAssertion
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from requests.packages.urllib3.exceptions import HTTPError
 
+from .models import BadgeStatus
+from .credly.serializers import BadgeDataModel
+from .credly.utils import get_credly_settings, build_authorization_token, get_badge_assertion_url
+
 log = logging.getLogger(__name__)
-
-
-class CredlySettings(BaseModel):
-    ORGANIZATION_ID: str
-    BASE_URL: str
-    API_BASE_URL: str
-    AUTHORIZATION_TOKEN: str
 
 
 class CredlyBackend(BadgeBackend):
@@ -29,12 +24,7 @@ class CredlyBackend(BadgeBackend):
     def __init__(self):
         super().__init__()
         try:
-            self.credly_settings = CredlySettings(
-                ORGANIZATION_ID=settings.CREDLY_BADGES_CONFIGURATION["ORGANIZATION_ID"],
-                BASE_URL=settings.CREDLY_BADGES_CONFIGURATION["BASE_URL"],
-                API_BASE_URL=settings.CREDLY_BADGES_CONFIGURATION["API_BASE_URL"],
-                AUTHORIZATION_TOKEN=settings.CREDLY_BADGES_CONFIGURATION["AUTHORIZATION_TOKEN"]
-            )
+            self.credly_settings = get_credly_settings()
         except ValidationError:
             error_msg = (
                 "One or more of the required settings are not defined. "
@@ -57,12 +47,6 @@ class CredlyBackend(BadgeBackend):
         """
         return f"{self._base_api_url}/badges"
 
-    def _get_badge_url(self, badge_id):
-        """
-        URL for badge info.
-        """
-        return f"{self.credly_settings.BASE_URL}/badges/{badge_id}"
-
     def _get_data_for_assertion(self, badge_class, user):
         """
         Generates data for request.
@@ -82,19 +66,11 @@ class CredlyBackend(BadgeBackend):
             "suppress_badge_notification_email": False,
         }
 
-    @staticmethod
-    def _build_authorization_token(authorization_token):
-        """
-        Build authorization token.
-        """
-        auth_token = authorization_token.encode("ascii")
-        return base64.b64encode(auth_token).decode("ascii")
-
     def _get_headers(self):
         """
         Headers to send along with the request-- used for authentication.
         """
-        auth_token = CredlyBackend._build_authorization_token(self.credly_settings.AUTHORIZATION_TOKEN)
+        auth_token = build_authorization_token(self.credly_settings.AUTHORIZATION_TOKEN)
         return {"Authorization": f"Basic {auth_token}"}
 
     def _log_if_raised(self, response, data):
@@ -124,12 +100,22 @@ class CredlyBackend(BadgeBackend):
         assertion, __ = BadgeAssertion.objects.get_or_create(user=user, badge_class=badge_class)
         assertion.data = data
         assertion.image_url = assertion.data["image"]["url"]
-        assertion.assertion_url = self._get_badge_url(assertion.data["id"])
+        assertion.assertion_url = get_badge_assertion_url(assertion.data["id"])
         assertion.backend = "CredlyBackend"
         assertion.save()
+
+        serializer = BadgeDataModel(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        BadgeStatus.objects.update_or_create(
+            assertion=assertion,
+            state=serializer.data["state"],
+            credly_badge_id=serializer.data["id"],
+        )
+
         return assertion
 
-    def award(self, badge_class, user, evidence_url=None):
+    def award(self, badge_class, user, evidence_url=None):  # pylint: disable=unused-argument
         data = self._get_data_for_assertion(badge_class, user)
         response = requests.post(self._assertion_url, headers=self._get_headers(), json=data, timeout=10)
 
