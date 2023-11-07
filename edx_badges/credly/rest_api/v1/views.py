@@ -51,11 +51,9 @@ class CredlyWebhook(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def _build_event_info_url(self, event_id):
-        return (
-            urljoin(
-                get_credly_settings().API_BASE_URL,
-                f"organizations/{get_credly_settings().ORGANIZATION_ID}/events/{event_id}"
-            ),
+        return urljoin(
+            get_credly_settings().API_BASE_URL,
+            f"organizations/{get_credly_settings().ORGANIZATION_ID}/events/{event_id}"
         )
 
     def _get_headers(self):
