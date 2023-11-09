@@ -38,7 +38,10 @@ class CredlyBackend(BadgeBackend):
         """
         Base URL for API requests.
         """
-        return f"{self.credly_settings.API_BASE_URL}/organizations/{self.credly_settings.ORGANIZATION_ID}"
+        return urljoin(
+            self.credly_settings.API_BASE_URL,
+            f"organizations/{self.credly_settings.ORGANIZATION_ID}"
+        )
 
     @property
     def _assertion_url(self):
