@@ -42,15 +42,14 @@ def update_badge_state(raw_data):
     badge_status = BadgeStatus.objects.filter(credly_badge_id=badge_serializer.data["id"]).first()
     if badge_status:
         state = badge_serializer.data["state"]
-        if state in (
-            BadgeStatus.PENDING,
-            BadgeStatus.REVOKED,
-            BadgeStatus.ACCEPTED,
-            BadgeStatus.REJECTED
-        ):
-            badge_status.state = state
-            badge_status.save()
+        if state == BadgeStatus.REVOKED:
+            badge_status.revoke()
+        elif state == BadgeStatus.ACCEPTED:
+            badge_status.accept()
+        elif state == BadgeStatus.REJECTED:
+            badge_status.reject()
 
+        badge_status.save()
         badge_status.assertion.data = raw_data
         badge_status.assertion.save()
 

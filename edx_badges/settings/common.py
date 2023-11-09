@@ -47,4 +47,4 @@ def plugin_settings(settings):
     }
 
     settings.BADGING_BACKEND = "edx_badges.backends.CredlyBackend"
-    settings.FEATURES['ENABLE_OPENBADGES'] = True
+    settings.FEATURES["ENABLE_OPENBADGES"] = True
