@@ -111,11 +111,14 @@ class CredlyBackend(BadgeBackend):
         serializer = BadgeDataModel(data=data)
         serializer.is_valid(raise_exception=True)
 
-        BadgeStatus.objects.update_or_create(
+        badge_status, __ = BadgeStatus.objects.update_or_create(
             assertion=assertion,
-            state=serializer.data["state"],
             credly_badge_id=serializer.data["id"],
         )
+
+        if serializer.data["state"] == BadgeStatus.ACCEPTED:
+            badge_status.accept()
+            badge_status.save()
 
         return assertion
 

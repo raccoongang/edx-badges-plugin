@@ -1,0 +1,28 @@
+{
+    "start-date": {
+      "year": {
+        "value": "{{ start_date_year }}"
+      },
+      "month": {
+        "value": "{{ start_date_month }}"
+      },
+      "day": {
+        "value": "{{ start_date_day }}"
+      }
+    },
+    "organization": {
+      "name": "National Aeronautics and Space Administration",
+      "address": {
+        "city": "Washington",
+        "region": "D.C",
+        "country": "US"
+      },
+      "disambiguated-organization": {
+        "disambiguated-organization-identifier": "https://ror.org/027ka1x80",
+        "disambiguation-source": "ROR"
+      }
+    },
+    "url": {
+      "value": "{{ url }}"
+    }
+}
