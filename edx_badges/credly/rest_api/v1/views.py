@@ -11,7 +11,11 @@ from rest_framework.views import APIView
 from requests.packages.urllib3.exceptions import HTTPError
 
 from .serializers import BadgeStateChangedSerializer
-from ...utils import build_authorization_token, get_credly_settings, update_badge_state
+from ...utils import (
+    get_credly_settings,
+    update_badge_state,
+    get_credly_auth_headers,
+)
 
 
 log = logging.getLogger(__name__)
@@ -32,7 +36,7 @@ class CredlyWebhook(APIView):
 
         event_info_response = requests.get(
             self._build_event_info_url(request_data_serializer.data["id"]),
-            headers=self._get_headers()
+            headers=get_credly_auth_headers()
         )
 
         try:
@@ -55,10 +59,3 @@ class CredlyWebhook(APIView):
             get_credly_settings().API_BASE_URL,
             f"organizations/{get_credly_settings().ORGANIZATION_ID}/events/{event_id}"
         )
-
-    def _get_headers(self):
-        """
-        Builds authorization headers.
-        """
-        auth_token = build_authorization_token(get_credly_settings().AUTHORIZATION_TOKEN)
-        return {"Authorization": f"Basic {auth_token}"}

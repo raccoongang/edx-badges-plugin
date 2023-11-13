@@ -3,3 +3,4 @@
 
 pydantic==1.10.13
 django-fsm==2.8.1
+django-admin-extra-buttons==1.5.5
