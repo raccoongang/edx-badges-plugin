@@ -42,7 +42,9 @@ def update_badge_state(raw_data):
     badge_status = BadgeStatus.objects.filter(credly_badge_id=badge_serializer.data["id"]).first()
     if badge_status:
         state = badge_serializer.data["state"]
-        if state == BadgeStatus.REVOKED:
+        if state == badge_status.state:
+            pass
+        elif state == BadgeStatus.REVOKED:
             badge_status.revoke()
         elif state == BadgeStatus.ACCEPTED:
             badge_status.accept()
@@ -59,3 +61,18 @@ def get_badge_assertion_url(badge_id):
     Returns URL for badge info.
     """
     return urljoin(get_credly_settings().BASE_URL, f"badges/{badge_id}")
+
+
+def get_badge_info_url(credly_badge_id):
+    return urljoin(
+        get_credly_settings().API_BASE_URL,
+        f"organizations/{get_credly_settings().ORGANIZATION_ID}/badges/{credly_badge_id}"
+    )
+
+
+def get_credly_auth_headers():
+    """
+    Builds authorization headers.
+    """
+    auth_token = build_authorization_token(get_credly_settings().AUTHORIZATION_TOKEN)
+    return {"Authorization": f"Basic {auth_token}"}
