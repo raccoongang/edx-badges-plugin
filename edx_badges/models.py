@@ -38,11 +38,13 @@ class BadgeStatus(models.Model):
 
     @transition(field=state, source=[PENDING, ACCEPTED], target=REVOKED)
     def revoke(self):
-        delete_orcid_qualification(self.assertion)
+        if self.state != self.PENDING:
+            delete_orcid_qualification(self.assertion)
 
-    @transition(field=state, source=PENDING, target=REJECTED)
+    @transition(field=state, source=[PENDING, ACCEPTED], target=REJECTED)
     def reject(self):
-        pass
+        if self.state != self.PENDING:
+            delete_orcid_qualification(self.assertion)
 
     @transition(field=state, source=[ACCEPTED, REJECTED, REVOKED, REPLACED], target=PENDING)
     def pending(self):
