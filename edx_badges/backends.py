@@ -59,7 +59,7 @@ class CredlyBackend(BadgeBackend):
 
         return {
             "recipient_email": user.email,
-            "badge_template_id": badge_class.slug,
+            "badge_template_id": badge_class.badgr_server_slug,
             "issued_at": datetime.now(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S %z"),
             "issued_to_first_name": user.first_name,
             "issued_to_last_name": user.last_name,
