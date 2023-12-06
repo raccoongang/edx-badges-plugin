@@ -12,6 +12,10 @@ Change Log
 Unreleased
 ----------
 
+[1.0.1] - 2023-12-06
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Allow configuring several badge classes for one Credly template
+
 [1.0.0] - 2023-11-21
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Manually refresh badge status from CREDLY in admin
